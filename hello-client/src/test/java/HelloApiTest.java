@@ -36,13 +36,17 @@ public class HelloApiTest {
                 .withSession().acquisitionTimeout(Duration.fromMilliseconds(10000))
                 .withSessionPool().minSize(3)
                 .filtered(retryExceptionsFilter)
-                .newIface("localhost:9233", "hello-server", HelloService.FutureIface.class);
-//                .newIface("zk!localhost:2181!/service/hello", "hello-server", HelloService.FutureIface.class);
+//                .newIface("localhost:9396", "hello-server", HelloService.FutureIface.class);
+                .newIface("zk!localhost:2181!/service/hello", "hello-server", HelloService.FutureIface.class);
     }
 
     @Test
-    public void testPing() {
-        System.out.println(helloService.ping().apply());
+    public void testPing() throws InterruptedException {
+        while (true) {
+            helloService.ping();
+            System.out.println("ping");
+            Thread.sleep(10);
+        }
     }
 
     @Test

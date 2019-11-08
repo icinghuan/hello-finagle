@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hello-server</artifactId>
+    <artifactId>hello-server-another</artifactId>
 
     <dependencies>
         <dependency>
@@ -63,15 +63,9 @@
 
         <dependency>
             <groupId>top.icinghuan</groupId>
-            <artifactId>hello-client</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>top.icinghuan</groupId>
             <artifactId>hello-client-another</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>com.typesafe</groupId>

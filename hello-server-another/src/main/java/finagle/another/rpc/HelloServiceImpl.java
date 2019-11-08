@@ -1,9 +1,11 @@
-package top.icinghuan.hello.finagle.rpc;
+package finagle.another.rpc;
 
-import com.icinghuan.hello.finagle.HelloService;
+import com.icinghuan.hello.finagle.HelloServiceAnother;
 import com.twitter.util.Future;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author : xuyuan
@@ -12,10 +14,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class HelloSeriveImpl implements HelloService.FutureIface {
+public class HelloServiceImpl implements HelloServiceAnother.FutureIface {
 
     @Override
     public Future<String> ping() {
+        try {
+            TimeUnit.MILLISECONDS.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return Future.value("pong");
     }
 

@@ -1,14 +1,16 @@
-package top.icinghuan.hello.finagle;
+package finagle.another;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.icinghuan.hello.finagle.HelloService;
+import com.icinghuan.hello.finagle.HelloServiceAnother;
 import com.twitter.finagle.ListeningServer;
 import com.twitter.finagle.Service;
 import com.twitter.finagle.Thrift;
 import com.twitter.finagle.thrift.Protocols;
 import com.twitter.util.Duration;
 import com.typesafe.config.ConfigFactory;
+import finagle.another.config.HelloConfig;
+import finagle.another.rpc.LoggingFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -16,11 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
-import top.icinghuan.hello.finagle.config.HelloConfig;
-import top.icinghuan.hello.finagle.rpc.HelloServiceImpl;
-import top.icinghuan.hello.finagle.rpc.LoggingFilter;
 
-import javax.annotation.Resource;
 import java.net.InetSocketAddress;
 import java.util.Properties;
 
@@ -32,14 +30,15 @@ import java.util.Properties;
 @Slf4j
 @Component
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
-public class HelloServer extends AbstractIdleService {
+public class HelloServerAnother extends AbstractIdleService {
 
     private ListeningServer server;
 
-    private HelloService.FutureIface futureIface = new HelloServiceImpl();
+    @Autowired
+    private HelloServiceAnother.FutureIface futureIface;
 
     public static void main(String[] args) {
-        SpringApplication application = new SpringApplication(HelloServer.class);
+        SpringApplication application = new SpringApplication(HelloServerAnother.class);
 
         Properties properties = new Properties();
         properties.put("spring.profiles.active", ConfigFactory.load().getString("env"));
@@ -50,7 +49,7 @@ public class HelloServer extends AbstractIdleService {
 
         context.registerShutdownHook();
 
-        HelloServer helloServer = context.getBean(HelloServer.class);
+        HelloServerAnother helloServer = context.getBean(HelloServerAnother.class);
         helloServer.startAsync();
     }
 
@@ -74,7 +73,7 @@ public class HelloServer extends AbstractIdleService {
         String zkPath = HelloConfig.getZkPath();
 
         LoggingFilter loggingFilter = new LoggingFilter();
-        HelloService.FinagledService finagledService = new HelloService.FinagledService(futureIface,
+        HelloServiceAnother.FinagledService finagledService = new HelloServiceAnother.FinagledService(futureIface,
                 Protocols.binaryFactory(
                         Protocols.binaryFactory$default$1(),
                         Protocols.binaryFactory$default$2(),
