@@ -5,10 +5,7 @@ import com.twitter.finagle.service.RetryExceptionsFilter;
 import com.twitter.finagle.service.RetryPolicy;
 import com.twitter.finagle.stats.NullStatsReceiver;
 import com.twitter.finagle.thrift.ThriftClientRequest;
-import com.twitter.util.Duration;
-import com.twitter.util.Future;
-import com.twitter.util.FutureEventListener;
-import com.twitter.util.Try;
+import com.twitter.util.*;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,17 +56,21 @@ public class HelloApiTest {
     @Test
     public void testFlatMap() {
         Future<Integer> futureIntegerA = Future.value(1);
-        Future<Integer> futureIntegerB = futureIntegerA.flatMap(this::multiplyTwo);
+        Future<Integer> futureIntegerB = futureIntegerA.flatMap(new Function<Integer, Future<Integer>>() {
+            public Future<Integer> apply(Integer i){
+                return Future.value(i * 2);
+            }
+        }).rescue(new Function<Throwable, Future<Integer>>() {
+            public Future<Integer> apply(Throwable t) {
+                return Future.exception(t);
+            }
+        });
         System.out.println(futureIntegerA.get());
         System.out.println(futureIntegerB.get());
     }
 
-    private Future<Integer> multiplyTwo(int i) {
-        return Future.value(i >> 1);
-    }
-
     @Test
-    public void testCallback() {
+    public void testCallback() throws InterruptedException {
         helloService.ping().addEventListener(new FutureEventListener<String>() {
             @Override
             public void onFailure(Throwable cause) {
@@ -81,5 +82,7 @@ public class HelloApiTest {
                 System.out.println(value);
             }
         });
+
+        Thread.sleep(1000);
     }
 }
