@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author : xuyuan
@@ -35,9 +35,17 @@ public class HelloServiceImpl implements HelloService.FutureIface {
                 .newIface(serverAddr, "hello-client", HelloServiceAnother.FutureIface.class);
     }
 
+    private AtomicInteger reqNum = new AtomicInteger(0);
+
     @Override
     public Future<String> ping() {
-        log.info(helloRpc.ping().apply(Duration.apply(1, TimeUnit.SECONDS)));
+        log.info("{}", reqNum.incrementAndGet());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        log.info(helloRpc.ping().apply(Duration.apply(1, TimeUnit.SECONDS)));
         return Future.value("pong");
     }
 

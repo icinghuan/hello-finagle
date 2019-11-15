@@ -32,6 +32,22 @@
         </dependency>
 
         <dependency>
+            <groupId>com.tigerbrokers.alpha</groupId>
+            <artifactId>commons</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tigerbrokers.alpha</groupId>
+            <artifactId>commons-finagle</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tigerbrokers.alpha</groupId>
+            <artifactId>metrics</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <exclusions>

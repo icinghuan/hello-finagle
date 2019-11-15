@@ -31,8 +31,8 @@ public class HelloApiTest {
                 .withSessionQualifier().noFailFast()
                 .withSessionQualifier().noFailureAccrual()
                 .withProtocolFactory(new TBinaryProtocol.Factory())
-                .withRequestTimeout(Duration.fromMilliseconds(10000))
-                .withSession().acquisitionTimeout(Duration.fromMilliseconds(10000))
+                .withRequestTimeout(Duration.fromMilliseconds(1000000))
+                .withSession().acquisitionTimeout(Duration.fromMilliseconds(1000000))
                 .withSessionPool().minSize(3)
                 .filtered(retryExceptionsFilter)
 //                .newIface("localhost:9396", "hello-server", HelloService.FutureIface.class);
@@ -41,16 +41,34 @@ public class HelloApiTest {
 
     @Test
     public void testPing() throws InterruptedException {
+        int i = 0;
         while (true) {
-            helloService.ping();
-            System.out.println("ping");
-            Thread.sleep(10);
+            i = i + 1;
+            int finalI = i;
+            helloService.ping().addEventListener(new FutureEventListener<String>() {
+                @Override
+                public void onFailure(Throwable cause) {
+                    System.out.println(finalI + cause.toString());
+                }
+
+                @Override
+                public void onSuccess(String value) {
+                    System.out.println(finalI + value);
+                }
+            });
+            System.out.println("ping #" + finalI);
+            Thread.sleep(100);
         }
     }
 
     @Test
     public void testHello() {
-        System.out.println(helloService.hello("world").apply());
+        System.out.println(helloService.hello("worldsadasdasdasdasdasdasdas" +
+                "asdasdasdasd" +
+                "asdasdasdasd" +
+                "asdasdasdasd" +
+                "asdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasd" +
+                "asdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasdasd").apply());
     }
 
     @Test

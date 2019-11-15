@@ -3,25 +3,18 @@ package top.icinghuan.hello.finagle;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.icinghuan.hello.finagle.HelloService;
+import com.tigerbrokers.alpha.commons.config.EnableConfig;
 import com.twitter.finagle.ListeningServer;
-import com.twitter.finagle.Service;
-import com.twitter.finagle.Thrift;
-import com.twitter.finagle.thrift.Protocols;
-import com.twitter.util.Duration;
 import com.typesafe.config.ConfigFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Component;
-import top.icinghuan.hello.finagle.config.HelloConfig;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableMBeanExport;
 import top.icinghuan.hello.finagle.rpc.HelloServiceImpl;
-import top.icinghuan.hello.finagle.rpc.LoggingFilter;
 
-import javax.annotation.Resource;
-import java.net.InetSocketAddress;
 import java.util.Properties;
 
 /**
@@ -30,8 +23,10 @@ import java.util.Properties;
  * Description :
  */
 @Slf4j
-@Component
-@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@EnableMBeanExport
+@EnableConfig
+@ComponentScan(basePackages = "top.icinghuan.hello")
 public class HelloServer extends AbstractIdleService {
 
     private ListeningServer server;
@@ -68,28 +63,6 @@ public class HelloServer extends AbstractIdleService {
 
     private void start() {
         Preconditions.checkArgument(futureIface != null);
-
-        int port = HelloConfig.getListeningPort();
-        String zkHost = HelloConfig.getZkHost();
-        String zkPath = HelloConfig.getZkPath();
-
-        LoggingFilter loggingFilter = new LoggingFilter();
-        HelloService.FinagledService finagledService = new HelloService.FinagledService(futureIface,
-                Protocols.binaryFactory(
-                        Protocols.binaryFactory$default$1(),
-                        Protocols.binaryFactory$default$2(),
-                        Protocols.binaryFactory$default$3(),
-                        Protocols.binaryFactory$default$4()
-                )
-        );
-        Service<byte[], byte[]> service = loggingFilter.andThen(finagledService);
-
-        server = Thrift.server()
-                .withLabel("hello-server")
-                .withRequestTimeout(Duration.fromSeconds(30))
-                .serve(new InetSocketAddress(port), service);
-
-        server.announce(String.format("zk!%s!%s!0", zkHost, zkPath)).get();
     }
 
     @Override
